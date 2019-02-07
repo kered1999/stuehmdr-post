@@ -1,5 +1,7 @@
 package com.cybr406.post;
 
+import org.hibernate.annotations.Type;
+
 import javax.persistence.*;
 
 @Entity
@@ -12,6 +14,7 @@ public class Post {
     String author;
 
     @Lob
+    @Type(type = "org.hibernate.type.TextType")
     String content;
 
     public Long getId() {
