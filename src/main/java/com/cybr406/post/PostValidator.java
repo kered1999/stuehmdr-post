@@ -23,7 +23,7 @@ public class PostValidator implements Validator {
         errors,
         "content",
         "field.required",
-        "Author is a required field.");
+        "Content is a required field.");
   }
   
 }
