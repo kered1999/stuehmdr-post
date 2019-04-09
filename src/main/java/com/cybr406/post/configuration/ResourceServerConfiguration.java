@@ -1,5 +1,6 @@
 package com.cybr406.post.configuration;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -14,6 +15,9 @@ import org.springframework.security.oauth2.provider.token.RemoteTokenServices;
 @EnableResourceServer
 public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter {
 
+    @Value("${check-token-endpoint}")
+    String checkTokenEndpoint;
+    
     @Override
     public void configure(ResourceServerSecurityConfigurer resources) throws Exception {
         resources.resourceId("post");
@@ -32,7 +36,7 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
     @Profile("!test")
     RemoteTokenServices remoteTokenServices() {
         final RemoteTokenServices tokenService = new RemoteTokenServices();
-        tokenService.setCheckTokenEndpointUrl("http://localhost:8081/oauth/check_token");
+        tokenService.setCheckTokenEndpointUrl(checkTokenEndpoint);
         tokenService.setClientId("post");
         tokenService.setClientSecret("secret");
         return tokenService;
