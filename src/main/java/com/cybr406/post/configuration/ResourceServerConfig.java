@@ -21,10 +21,11 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
     public void configure(HttpSecurity http) throws Exception {
         // @formatter:off
         http
-                .requestMatchers().antMatchers("/posts/**")
+                .requestMatchers().antMatchers("/posts/**", "/profiles/**")
                 .and()
                 .authorizeRequests()
-                .antMatchers(HttpMethod.GET, "/posts/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/posts/**", "/profile/**").permitAll()
+                .antMatchers(HttpMethod.POST, "/posts/**").permitAll()
                 .antMatchers("/profiles/**", "/profiles", "/posts", "/posts/**")
                 .access("#oauth2.isOAuth() and hasAnyRole('ROLE_BLOGGER', 'ROLE_ADMIN')");
         // @formatter:on

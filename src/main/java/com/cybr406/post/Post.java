@@ -6,7 +6,6 @@ import javax.persistence.*;
 
 @Entity
 public class Post {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
@@ -40,5 +39,4 @@ public class Post {
     public void setContent(String content) {
         this.content = content;
     }
-
 }

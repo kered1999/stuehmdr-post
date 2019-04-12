@@ -26,6 +26,19 @@
             <column name="content" type="STRING"/>
         </loadData>
     </changeSet>
+    <changeSet id="add_comment" author="DerekS">
+        <createTable tableName="comment">
+            <column name="comment_content" type="CLOB">
+                <constraints nullable="false"/>
+            </column>
+            <column name="comment_author" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="comment_id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+        </createTable>
+    </changeSet>
 
 </databaseChangeLog>
 
