@@ -1,24 +1,29 @@
 package com.cybr406.post;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 
 import javax.validation.Valid;
+import java.lang.reflect.Field;
+import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 @RestController
 public class PostController {
   
   private PostRepository postRepository;
 
-  @Autowired
   public PostController(PostRepository postRepository) {
     this.postRepository = postRepository;
   }
@@ -30,6 +35,11 @@ public class PostController {
   
   @PostMapping("/posts")
   public ResponseEntity<Post> createPost(@Valid @RequestBody Post post) {
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    String user = (String) auth.getPrincipal();
+    
+    post.setAuthor(user);
+    
     return new ResponseEntity<>(postRepository.save(post), HttpStatus.CREATED);
   }
   
@@ -44,27 +54,53 @@ public class PostController {
         .map(post -> new ResponseEntity<>(post, HttpStatus.OK))
         .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
   }
-
-  @PutMapping("/posts/{id}")
-  public ResponseEntity<Post> putPost(@PathVariable Long id, @Valid @RequestBody Post post) {
-    if (!postRepository.findById(id).isPresent()) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
-    post.setId(id);
-    return new ResponseEntity<>(postRepository.save(post), HttpStatus.OK);
-  }
   
   @PatchMapping("/posts/{id}")
   public ResponseEntity<Post> patchPost(@PathVariable Long id, @RequestBody Map<String, Object> patch) {
-    return postRepository.findById(id)
-        .map(post -> new ResponseEntity<>(applyPatch(patch, post), HttpStatus.OK))
-        .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    Optional<Post> result = postRepository.findById(id);
+    
+    if (!result.isPresent()) {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);  
+    }
+    
+    if (cannotModifyPost(result.get())) {
+      return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    }
+
+    return new ResponseEntity<>(applyPatch(patch, result.get()), HttpStatus.OK);
+  }
+
+  @DeleteMapping("/posts/{id}")
+  public ResponseEntity deletePost(@PathVariable Long id) {
+    Optional<Post> result = postRepository.findById(id);
+
+    if (!result.isPresent()) {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    if (cannotModifyPost(result.get())) {
+      return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    }
+
+    postRepository.delete(result.get());
+    
+    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+  }
+  
+  private boolean cannotModifyPost(Post post) {
+    String author = post.getAuthor();
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    String user = (String) auth.getPrincipal();
+    Collection authorities = auth.getAuthorities();
+    return !user.equals(author) && !authorities.contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
   }
   
   private Post applyPatch(Map<String, Object> patch, Post post) {
     patch.forEach((key, value) -> {
       try {
-        ReflectionUtils.setField(post.getClass().getField(key), post, value);
+        Field field = ReflectionUtils.findField(Post.class, key);
+        ReflectionUtils.makeAccessible(Objects.requireNonNull(field));
+        ReflectionUtils.setField(field, post, value);
       } catch (Exception e) {
         throw new HttpClientErrorException(
             HttpStatus.BAD_REQUEST,

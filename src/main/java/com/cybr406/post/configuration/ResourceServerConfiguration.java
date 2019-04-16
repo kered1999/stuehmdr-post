@@ -29,7 +29,7 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
             .authorizeRequests()
             .antMatchers(HttpMethod.GET, "/", "/posts/**").permitAll()
             .anyRequest()
-            .access("#oauth2.isOAuth() and hasRole('ROLE_BLOGGER')");
+            .access("#oauth2.isOAuth() and hasAnyRole('ROLE_BLOGGER', 'ROLE_ADMIN')");
     }
 
     @Bean
