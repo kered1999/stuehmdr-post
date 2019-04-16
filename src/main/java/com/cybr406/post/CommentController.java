@@ -3,6 +3,7 @@ package com.cybr406.post;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,10 +33,10 @@ public class CommentController {
 //                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-//    @GetMapping("/posts/{id}/comments")
-//    public ResponseEntity<Comment> getPostComment(@PathVariable Long postId){
-//        return commentRepository.
-//    }
+    @GetMapping("/posts/{id}/comments")
+    public Page<Comment> getPostComment(Pageable pageable, @PathVariable Long postId){
+        return commentRepository.findAll(pageable);
+    }
 
     @PostMapping("/posts/comments")
     public ResponseEntity<Comment> putComment(@Valid @RequestBody Comment comment) {

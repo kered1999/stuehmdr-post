@@ -22,7 +22,7 @@ public class Comment {
         return postId;
     }
 
-    public void setPostID(Long postId) {
+    public void setPostId(Long postId) {
         this.postId = postId;
     }
 
