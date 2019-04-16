@@ -23,5 +23,11 @@ public class CommentValidator implements Validator {
                 "commentContent",
                 "field.required",
                 "Content is a required field.");
+        ValidationUtils.rejectIfEmptyOrWhitespace(
+                errors,
+                "postId",
+                "field.required",
+                "PostId is a required field"
+        );
     }
 }

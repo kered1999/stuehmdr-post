@@ -10,11 +10,21 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long commentId;
 
+    Long postId;
+
     String commentAuthor;
 
     @Lob
     @Type(type = "org.hibernate.type.TextType")
     String commentContent;
+
+    public Long getPostId() {
+        return postId;
+    }
+
+    public void setPostID(Long postId) {
+        this.postId = postId;
+    }
 
     public Long getCommentId() {
         return commentId;

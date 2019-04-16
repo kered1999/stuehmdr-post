@@ -24,19 +24,25 @@ public class CommentController {
         webDataBinder.addValidators(new CommentValidator());
     }
 
-    @GetMapping("/posts/{id}/comments")
-    public ResponseEntity<Comment> getComments(Pageable pageable, @PathVariable Long id) {
-        //return commentRepository.findAll(pageable);
-               return commentRepository.findById(id)
-                .map(comment -> new ResponseEntity<>(comment, HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    @GetMapping("/posts/comments")
+    public Page<Comment> getComments(Pageable pageable) {
+        return commentRepository.findAll(pageable);
+//        return commentRepository.findById(id)
+//                .map(comment -> new ResponseEntity<>(comment, HttpStatus.OK))
+//                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    @PostMapping("/posts/{id}/comments")
-    public ResponseEntity<Comment> putComment(@PathVariable Long id, @Valid @RequestBody Comment comment) {
-        if (!commentRepository.findById(id).isPresent()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(commentRepository.save(comment), HttpStatus.OK);
+//    @GetMapping("/posts/{id}/comments")
+//    public ResponseEntity<Comment> getPostComment(@PathVariable Long postId){
+//        return commentRepository.
+//    }
+
+    @PostMapping("/posts/comments")
+    public ResponseEntity<Comment> putComment(@Valid @RequestBody Comment comment) {
+        return new ResponseEntity<>(commentRepository.save(comment), HttpStatus.CREATED);
+        //        if (!commentRepository.findById(id).isPresent()) {
+//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//        }
+//        return new ResponseEntity<>(commentRepository.save(comment), HttpStatus.OK);
     }
 }
