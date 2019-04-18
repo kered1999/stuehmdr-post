@@ -17,7 +17,7 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
 
     @Value("${check-token-endpoint}")
     String checkTokenEndpoint;
-    
+
     @Override
     public void configure(ResourceServerSecurityConfigurer resources) throws Exception {
         resources.resourceId("post");
@@ -26,10 +26,11 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
     @Override
     public void configure(HttpSecurity http) throws Exception {
         http
-            .authorizeRequests()
-            .antMatchers(HttpMethod.GET, "/", "/posts/**").permitAll()
-            .anyRequest()
-            .access("#oauth2.isOAuth() and hasAnyRole('ROLE_BLOGGER', 'ROLE_ADMIN')");
+                .authorizeRequests()
+                .antMatchers(HttpMethod.GET, "/", "/posts/**").permitAll()
+                .antMatchers(HttpMethod.POST, "/posts/comments").permitAll()
+                .anyRequest()
+                .access("#oauth2.isOAuth() and hasAnyRole('ROLE_BLOGGER', 'ROLE_ADMIN')");
     }
 
     @Bean
