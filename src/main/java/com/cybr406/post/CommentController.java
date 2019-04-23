@@ -7,6 +7,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
@@ -40,8 +42,12 @@ public class CommentController {
 
     @PostMapping("/posts/comments")
     public ResponseEntity<Comment> putComment(@Valid @RequestBody Comment comment) {
-        return new ResponseEntity<>(commentRepository.save(comment), HttpStatus.CREATED);
-    }
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String user = (String) auth.getPrincipal();
+
+        comment.setCommentAuthor(user);
+
+        return new ResponseEntity<>(commentRepository.save(comment), HttpStatus.CREATED);    }
 
     @PatchMapping("/posts/comments/{id}")
     public ResponseEntity<Comment> patchComment(@PathVariable Long id, @RequestBody Map<String, Object> patch) {
