@@ -12,11 +12,6 @@ public class CommentValidator implements Validator {
 
     @Override
     public void validate(Object target, Errors errors) {
-        ValidationUtils.rejectIfEmptyOrWhitespace(
-                errors,
-                "commentAuthor",
-                "field.required",
-                "Author is a required field.");
 
         ValidationUtils.rejectIfEmptyOrWhitespace(
                 errors,
