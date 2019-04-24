@@ -40,6 +40,14 @@ public class CommentController {
         return commentRepository.findByPostId(pageable, postId);
     }
 
+    @GetMapping("/posts/comments/{id}")
+    public ResponseEntity<Comment> getComment(@PathVariable Long id) {
+        return commentRepository.findById(id)
+                .map(comment -> new ResponseEntity<>(comment, HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+
     @PostMapping("/posts/comments")
     public ResponseEntity<Comment> putComment(@Valid @RequestBody Comment comment) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
