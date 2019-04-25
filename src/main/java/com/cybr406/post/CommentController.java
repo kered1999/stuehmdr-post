@@ -48,12 +48,13 @@ public class CommentController {
     }
 
 
-    @PostMapping("/posts/comments")
-    public ResponseEntity<Comment> putComment(@Valid @RequestBody Comment comment) {
+    @PostMapping("/posts/{postid}/comments")
+    public ResponseEntity<Comment> putComment(@PathVariable Long postid, @Valid @RequestBody Comment comment) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String user = (String) auth.getPrincipal();
 
         comment.setCommentAuthor(user);
+        comment.setPostId(postid);
 
         return new ResponseEntity<>(commentRepository.save(comment), HttpStatus.CREATED);    }
 
